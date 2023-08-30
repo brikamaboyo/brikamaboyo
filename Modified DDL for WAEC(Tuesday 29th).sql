@@ -118,11 +118,13 @@ CREATE TABLE CONTRACTORTUTORIALCLASS(
 	CONSTRAINT tutorial_class_contractor FOREIGN KEY(contractorID) REFERENCES CONTRACTOR(contractor_code),
 	CONSTRAINT tutorial_class_sch FOREIGN KEY(schoolID) REFERENCES SCHOOL(scl_code)
 );
+
 CREATE TABLE EXAMDIET(
 	diet_code VARCHAR(10),
 	dietName VARCHAR(20),
 	CONSTRAINT examDiet_dietCode_pk PRIMARY KEY(diet_code),
 );
+
 CREATE TABLE EXAMCATEGORY(
 	exam_category_code VARCHAR(10),
 	exam_category_name VARCHAR(100), -- WASSCE, GABECE OR NAT
@@ -167,7 +169,7 @@ CREATE TABLE COURSEWORK(
 	Cwork_name VARCHAR(20),
 	courseword_rate DECIMAL(8,2),
 	remarks VARCHAR(500),
-	CONSTRAINT coursework_pk PRIMARY KEY(Cwork_name),
+	CONSTRAINT coursework_pk PRIMARY KEY(subject_id),
 	CONSTRAINT coursework_subject_fk FOREIGN KEY(subject_id, Cwrok_exam_category) REFERENCES SUBJECT(subject_code, exam_category_code),
 	CONSTRAINT courseWork_SubjectLevel_fk FOREIGN KEY(Cwrok_exam_category) REFERENCES EXAMCATEGORY(exam_category_code),
 	CONSTRAINT courseWork_ExamDiet_fk FOREIGN KEY(Cwork_examDiet) REFERENCES EXAMDIET(diet_code),
@@ -200,12 +202,12 @@ CREATE TABLE ORAL(
 CREATE TABLE COURSEWORKALLOCATION(
 	SN INTEGER,
 	contractor_code INTEGER,
-	Cwork_name VARCHAR(10),
+	Csubject_code VARCHAR(10),
 	number_of_works INTEGER,
 	dates DATE,
 	CONSTRAINT courseWorkAllocation_SN_pk PRIMARY KEY(SN),
 	CONSTRAINT courseWorkAllocation_Contractor_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
-	CONSTRAINT courseWork_courseName_fk FOREIGN KEY(Cwork_name) REFERENCES COURSEWORK(Cwork_name),
+	CONSTRAINT courseWork_courseName_fk FOREIGN KEY(Csubject_code) REFERENCES COURSEWORK(subject_id),
 );
 
 --ALLOCATE PRACTICAL TO A CONTRACTOR
