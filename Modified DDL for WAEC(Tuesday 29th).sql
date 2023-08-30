@@ -259,14 +259,13 @@ CREATE TABLE SCRIPTALLOCATION(
 	CONSTRAINT subjectMarked_fk FOREIGN KEY(subjectCode, subject_level) REFERENCES SUBJECT(subject_code, exam_category_code),
 	CONSTRAINT Script_examiner_fk FOREIGN KEY(examinerID) REFERENCES CONTRACTOR(contractor_code),
 	CONSTRAINT ScriptAllocation_examPaperCode_fk FOREIGN KEY(subjectPaperCode) REFERENCES SUBJECTPAPER(subject_paper_code),
-
 );
 
 -- ALLOWANCE PAYMENT TO DIFFERENT CONTRACTORS BASED ON THE LOCATION AND STATUS
 
 CREATE TABLE TOWNSTATUS(
 	status_code INTEGER,
-	town_description VARCHAR(40), --
+	town_description VARCHAR(40), 
 	CONSTRAINT townstatus_pk PRIMARY KEY(status_code)
 );
 
@@ -275,33 +274,37 @@ CREATE TABLE TOWN(
 	town_name VARCHAR(40),
 	town_location INTEGER,
 	CONSTRAINT town_town_code_pk PRIMARY KEY(town_code),
-	CONSTRAINT townLocation_fk FOREIGN KEY(town_location) REFERENCES TOWNSTATUS(status_code)
-);
-			
-
-CREATE TABLE TRANSPORTFARE(
-	towncode INTEGER,
-	townStatusCode INTEGER,
-	fareRate DECIMAL(8,2),
-	CONSTRAINT transportfare_pk PRIMARY KEY(towncode, townStatusCode, fareRate),
-	CONSTRAINT townstatus_code_fk FOREIGN KEY(townStatusCode) REFERENCES TOWNSTATUS(status_code),
-	CONSTRAINT TransportFare_townCode_fk FOREIGN KEY(towncode) REFERENCES TOWN(town_code),
+	CONSTRAINT townLocation_fk FOREIGN KEY(town_location) REFERENCES TOWNSTATUS(status_code),
 );
 
 CREATE TABLE VEHICLE(
 	vehicle_code INTEGER,
 	vehicle_type VARCHAR(40),
+	vehicle_rate DECIMAL(8,2),
 	CONSTRAINT vehicle_pk PRIMARY KEY(vehicle_code)
 );
 
 CREATE TABLE VIHECLEREGISTRATION(
 	vehicle_code INTEGER,
 	insurance VARCHAR(20),
-	licence VARCHAR(20),
 	vehicleNumber VARCHAR(20),
 	contractor_code INTEGER,
-	CONSTRAINT eVihecleReg_contractor_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
-	CONSTRAINT eVihecleReg_vehicleCode_fk FOREIGN KEY(vehicle_code) REFERENCES VEHICLE(vehicle_code),
+	CONSTRAINT VehicleRegistration_VehicleCode_Pk PRIMARY KEY(vehicleNumber),
+	CONSTRAINT VihecleReg_contractor_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
+	CONSTRAINT VihecleReg_vehicleCode_fk FOREIGN KEY(vehicle_code) REFERENCES VEHICLE(vehicle_code),
+);
+
+CREATE TABLE VEHICLEREFUND(
+	towncode INTEGER, -- specifies the town
+	vehicleNumber VARCHAR(20), -- IDENTIFIES THE VEHICLE ITSELF
+	contractor_code INTEGER,
+	startDate DATE,
+	endDate DATE,
+	amountEarned DECIMAL(8,2),
+	CONSTRAINT vehicle_refund_pk PRIMARY KEY(vehicleNumber),
+	CONSTRAINT towncode_fk FOREIGN KEY(towncode) REFERENCES TOWN(town_code),
+	CONSTRAINT vehicle_code_fk FOREIGN KEY(vehicleNumber) REFERENCES VIHECLEREGISTRATION(vehicleNumber),
+	CONSTRAINT contractor_vehicleRefund_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
 );
 
 CREATE TABLE OVERNIGHTALLOWANCE(
@@ -317,21 +320,12 @@ CREATE TABLE OVERNIGHTALLOWANCE(
 	CONSTRAINT contractor_overnightAllowance_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
 );
 
-CREATE TABLE VEHICLEREFUND(
-	towncode INTEGER, -- specifies the town
-	townStatusCode INTEGER, --urban or rural
-	vehicleCode INTEGER,
-	vehicleNumber VARCHAR(20), -- IDENTIFIES THE VEHICLE ITSELF
-	contractor_code INTEGER,
-	startDate DATE,
-	endDate DATE,
-	amountEarned DECIMAL(8,2),
-	--vehicle_refund_rate DECIMAL(8,2), -- THE RATE FOR REFUNDING THE VEHICLE USED 
-	CONSTRAINT vehicle_refund_pk PRIMARY KEY(towncode, townStatusCode, vehicleCode),
-	CONSTRAINT towncode_fk FOREIGN KEY(towncode) REFERENCES TOWN(town_code),
-	CONSTRAINT townstatus_vehicle_fk FOREIGN KEY(townStatusCode) REFERENCES TOWNSTATUS(status_code),
-	CONSTRAINT vehicle_code_fk FOREIGN KEY(vehicleCode) REFERENCES VEHICLE(vehicle_code),
-	CONSTRAINT contractor_vehicleRefund_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
+CREATE TABLE TRANSPORTFARERATE(
+	towncode INTEGER,
+	fareRate DECIMAL(8,2),
+	CONSTRAINT transportfare_pk PRIMARY KEY(towncode, townStatusCode, fareRate),
+	CONSTRAINT townstatus_code_fk FOREIGN KEY(townStatusCode) REFERENCES TOWNSTATUS(status_code),
+	CONSTRAINT TransportFare_townCode_fk FOREIGN KEY(towncode) REFERENCES TOWN(town_code),
 );
 
 CREATE TABLE TRANSPORTREFUND(
