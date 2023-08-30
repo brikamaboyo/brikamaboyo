@@ -163,21 +163,25 @@ CREATE TABLE SUBJECTPAPER(
 CREATE TABLE COURSEWORK(
 	subject_id VARCHAR(10),
 	Cwrok_exam_category VARCHAR(10), --THIS INDICATE IF PRACTICAL IS FOR WASSCE OR GABECE
+	Cwork_examDiet VARCHAR(10),
 	Cwork_name VARCHAR(20),
 	courseword_rate DECIMAL(8,2),
 	remarks VARCHAR(500),
 	CONSTRAINT coursework_pk PRIMARY KEY(Cwork_name),
 	CONSTRAINT coursework_subject_fk FOREIGN KEY(subject_id, Cwrok_exam_category) REFERENCES SUBJECT(subject_code, exam_category_code),
 	CONSTRAINT courseWork_SubjectLevel_fk FOREIGN KEY(Cwrok_exam_category) REFERENCES EXAMCATEGORY(exam_category_code),
+	CONSTRAINT courseWork_ExamDiet_fk FOREIGN KEY(Cwork_examDiet) REFERENCES EXAMDIET(diet_code),
 );
 
 CREATE TABLE PRACTICAL(
 	subject_id VARCHAR(10),
 	exam_category_code VARCHAR(10), --THIS INDICATE IF PRACTICAL IS FOR WASSCE OR GABECE
+	diet_code VARCHAR(10), --IDENTIFIES (MAY/JUNE OR NOVEMBER/DECEMBER)
 	practical_name VARCHAR(20),
 	practical_rate DECIMAL(8,2),
 	remarks VARCHAR(500),
-	CONSTRAINT practical_work_pk PRIMARY KEY(practical_name),
+	CONSTRAINT practical_work_pk PRIMARY KEY(subject_id),
+	CONSTRAINT practical_dietCode_fk FOREIGN KEY(diet_code) REFERENCES EXAMDIET(diet_code),
 	CONSTRAINT practical_work_subject_fk FOREIGN KEY(subject_id, exam_category_code) REFERENCES SUBJECT(subject_code, exam_category_code)
 );
 
@@ -208,12 +212,12 @@ CREATE TABLE COURSEWORKALLOCATION(
 CREATE TABLE PRACTICALALLOCATION(
 	SN INTEGER,
 	contractor_code INTEGER,
-	practical_name VARCHAR(10),
+	practical_subject VARCHAR(10),
 	number_of_works INTEGER,
 	dates DATE,
 	CONSTRAINT practicalAllocation_SN_pk PRIMARY KEY(SN),
 	CONSTRAINT practicalAllocation_Contractor_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
-	CONSTRAINT practical_courseName_fk FOREIGN KEY(practical_name) REFERENCES PRACTICAL(practical_name),
+	CONSTRAINT practical_courseName_fk FOREIGN KEY(practical_subject) REFERENCES PRACTICAL(subject_id),
 );
 
 --ALLOCATE ORAL TO A CONTRACTOR
@@ -292,7 +296,7 @@ CREATE TABLE VEHICLE(
 	CONSTRAINT vehicle_pk PRIMARY KEY(vehicle_code)
 );
 
-CREATE TABLE EVIHECLEREGISTRATION(
+CREATE TABLE VIHECLEREGISTRATION(
 	vehicle_code INTEGER,
 	insurance VARCHAR(20),
 	licence VARCHAR(20),
@@ -301,15 +305,6 @@ CREATE TABLE EVIHECLEREGISTRATION(
 	CONSTRAINT eVihecleReg_contractor_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
 	CONSTRAINT eVihecleReg_vehicleCode_fk FOREIGN KEY(vehicle_code) REFERENCES VEHICLE(vehicle_code),
 );
-
---CREATE TABLE OVERNIGHT(
-	--town_code INTEGER,
-	--townStatus INTEGER,
---	overnight_rate DECIMAL(8,2),
---	fareRate DECIMAL(8,2),
-	--CONSTRAINT townForOvernightAllowance FOREIGN KEY(town_code) REFERENCES TOWN(town_code),
-	--CONSTRAINT townStatus_forOvernight FOREIGN KEY(townStatus) REFERENCES TOWNSTATUS(status_code)
---);
 
 CREATE TABLE OVERNIGHTALLOWANCE(
 	townCode INTEGER, 
