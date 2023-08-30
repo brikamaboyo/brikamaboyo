@@ -236,14 +236,12 @@ CREATE TABLE EXAMCENTER(
 	region_code INTEGER,
 	centre_NUMBER VARCHAR(10),
 	centre_name VARCHAR(40),
-	centre_type VARCHAR(40), -- IDENTIFIED IF THE CENTER IS FOR (NAT, WASSCE OR GABECE)
-	centre_address VARCHAR(40), -- SOME CENTERS CAN BE USED FOR BOTH GABECE AND WASSCE
+	centre_address VARCHAR(40), 
 	contact_person VARCHAR(40),
 	phone VARCHAR(40),
 	email VARCHAR(40),
 	CONSTRAINT examcenter_pk PRIMARY KEY(centre_NUMBER),
-	CONSTRAINT examcenter_region_fk FOREIGN KEY(region_code) REFERENCES REGION(region_code)
-	-- A REFERENCE TO EXAM CATEGORY SHOULD BE ADDED HERE  FOR centre_type
+	CONSTRAINT examcenter_region_fk FOREIGN KEY(region_code) REFERENCES REGION(region_code),
 );
 
 -- SCRIPT ALLOCATION TO EXAMINERS FOR MARKING
@@ -259,8 +257,8 @@ CREATE TABLE SCRIPTALLOCATION(
 	CONSTRAINT seniorScriptMarking_pk PRIMARY KEY(center_code, subjectCode, examinerID),
 	CONSTRAINT schoolid_fk FOREIGN KEY(center_code) REFERENCES EXAMCENTER(centre_NUMBER),
 	CONSTRAINT subjectMarked_fk FOREIGN KEY(subjectCode, subject_level) REFERENCES SUBJECT(subject_code, exam_category_code),
-	CONSTRAINT gScript_examiner_fk FOREIGN KEY(examinerID) REFERENCES CONTRACTOR(contractor_code),
-	CONSTRAINT gScriptAllocation_examPaperCode_fk FOREIGN KEY(subjectPaperCode) REFERENCES SUBJECTPAPER(subject_paper_code),
+	CONSTRAINT Script_examiner_fk FOREIGN KEY(examinerID) REFERENCES CONTRACTOR(contractor_code),
+	CONSTRAINT ScriptAllocation_examPaperCode_fk FOREIGN KEY(subjectPaperCode) REFERENCES SUBJECTPAPER(subject_paper_code),
 
 );
 
