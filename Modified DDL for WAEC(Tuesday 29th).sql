@@ -131,20 +131,6 @@ CREATE TABLE EXAMCATEGORY(
 	CONSTRAINT examCategoryDiet_fk FOREIGN KEY(diet_code) REFERENCES EXAMDIET(diet_code),
 );
 
-CREATE TABLE CONTRACTORPOSTING( 
-	contractorCode INTEGER NOT NULL,
-	contract_code INTEGER NOT NULL,
-	posting_start_date DATE,
-	posting_end_date DATE,
-	centre_Number INTEGER,
-	exam_category_code VARCHAR(10),
-	CONSTRAINT contractoposting_pk PRIMARY KEY(contract_code, posting_end_date, posting_start_date),
-	CONSTRAINT contractoposting_contract_fk FOREIGN KEY(contract_code) REFERENCES CONTRACT(contract_code),
-	CONSTRAINT contractor_contractorPosting_fk FOREIGN KEY(contractorCode) REFERENCES CONTRACTOR(contractor_code),
-	CONSTRAINT contractorPosting_examCategory FOREIGN KEY(exam_category_code) REFERENCES EXAMCATEGORY(exam_category_code),
-
-);
-
 CREATE TABLE BLACKLIST(
 	contractor_code INTEGER,
 	dates DATE,
@@ -163,7 +149,8 @@ CREATE TABLE SUBJECT(
 	CONSTRAINT SUBJECT_exam_category_code_fk FOREIGN KEY(exam_category_code) REFERENCES EXAMCATEGORY(exam_category_code)
 );
 
-CREATE TABLE SUBJECTPAPER( -- THIS TABLE RECORDS ALL THE SUBJECT PAPERS AND THEIR RATES
+-- THIS TABLE RECORDS ALL THE SUBJECT PAPERS AND THEIR RATES
+CREATE TABLE SUBJECTPAPER( 
 	subject_paper_code VARCHAR(10), -- THEORY, ESSAY ETC
 	subject_code VARCHAR(10), -- THE EXAM SUBJECT
 	exam_category_code VARCHAR(10), -- SUBJECT LEVEL (GABECE, WASSCE OR NAT)
@@ -194,6 +181,17 @@ CREATE TABLE PRACTICAL(
 	CONSTRAINT practical_work_subject_fk FOREIGN KEY(subject_id, exam_category_code) REFERENCES SUBJECT(subject_code, exam_category_code)
 );
 
+CREATE TABLE ORAL(
+	oral_subject VARCHAR(10),
+	oral_exam_category VARCHAR(10),
+	oral_exam_diet VARCHAR(10),
+	oral_description VARCHAR(50),
+	CONSTRAINT oral_oralSubject_pk PRIMARY KEY(oral_subject),
+	CONSTRAINT oralSubject_subject FOREIGN KEY(oral_subject, oral_exam_category) REFERENCES SUBJECT(subject_code, exam_category_code),
+	CONSTRAINT oral_category_fk FOREIGN KEY(oral_exam_category) REFERENCES EXAMCATEGORY(exam_category_code),
+	CONSTRAINT oral_OralExamDiet_fk FOREIGN KEY(oral_exam_diet) REFERENCES EXAMDIET(diet_code),
+);
+
 --ALLOCATE COURSEWORK TO A CONTRACTOR
 CREATE TABLE COURSEWORKALLOCATION(
 	SN INTEGER,
@@ -216,6 +214,18 @@ CREATE TABLE PRACTICALALLOCATION(
 	CONSTRAINT practicalAllocation_SN_pk PRIMARY KEY(SN),
 	CONSTRAINT practicalAllocation_Contractor_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
 	CONSTRAINT practical_courseName_fk FOREIGN KEY(practical_name) REFERENCES PRACTICAL(practical_name),
+);
+
+--ALLOCATE ORAL TO A CONTRACTOR
+CREATE TABLE ORALALLOCATION(
+	SN INTEGER,
+	contractor_code INTEGER,
+	oral_subject VARCHAR(10),
+	number_of_works INTEGER,
+	dates DATE,
+	CONSTRAINT courseWorkAllocation_SN_pk PRIMARY KEY(SN),
+	CONSTRAINT courseWorkAllocation_Contractor_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
+	CONSTRAINT courseWork_courseName_fk FOREIGN KEY(oral_subject) REFERENCES ORAL(oral_subject),
 );
 
 CREATE TABLE EXAMCENTER(
@@ -248,16 +258,6 @@ CREATE TABLE SCRIPTALLOCATION(
 	CONSTRAINT gScript_examiner_fk FOREIGN KEY(examinerID) REFERENCES CONTRACTOR(contractor_code),
 	CONSTRAINT gScriptAllocation_examPaperCode_fk FOREIGN KEY(subjectPaperCode) REFERENCES SUBJECTPAPER(subject_paper_code),
 
-);
-
-
-CREATE TABLE ORAL(
-	oral_subject VARCHAR(10),
-	oral_Sub_Level VARCHAR(10),
-	oral_description VARCHAR(50),
-	oral_level_category VARCHAR(10),
-	CONSTRAINT oralSubject_subject FOREIGN KEY(oral_subject, oral_Sub_Level) REFERENCES SUBJECT(subject_code, exam_category_code),
-	CONSTRAINT oral_category_fk FOREIGN KEY(oral_level_category) REFERENCES EXAMCATEGORY(exam_category_code),
 );
 
 -- ALLOWANCE PAYMENT TO DIFFERENT CONTRACTORS BASED ON THE LOCATION AND STATUS
