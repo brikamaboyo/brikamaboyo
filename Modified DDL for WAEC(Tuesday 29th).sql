@@ -229,9 +229,9 @@ CREATE TABLE ORALALLOCATION(
 	oral_subject VARCHAR(10),
 	number_of_works INTEGER,
 	dates DATE,
-	CONSTRAINT courseWorkAllocation_SN_pk PRIMARY KEY(SN),
-	CONSTRAINT courseWorkAllocation_Contractor_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
-	CONSTRAINT courseWork_courseName_fk FOREIGN KEY(oral_subject) REFERENCES ORAL(oral_subject),
+	CONSTRAINT oralAllocation_SN_pk PRIMARY KEY(SN),
+	CONSTRAINT oralAllocation_Contractor_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
+	CONSTRAINT oral_courseName_fk FOREIGN KEY(oral_subject) REFERENCES ORAL(oral_subject),
 );
 
 CREATE TABLE EXAMCENTER(
