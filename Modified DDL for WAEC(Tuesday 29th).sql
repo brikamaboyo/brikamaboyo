@@ -464,7 +464,7 @@ CREATE TABLE CLAIMANT(
 	confirmed_by INTEGER, 
 	approved_by INTEGER, 
 	clain_date DATE, 
-	CONSTRAINT VETTING_contractorCode_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
+	CONSTRAINT CLAIMANT_contractorCode_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
 	CONSTRAINT CLAIMANT_checkedBy_fk FOREIGN KEY(checked_by) REFERENCES WAECOFFICER(officer_id),
 	CONSTRAINT CLAIMANT_confirmedBy_fk FOREIGN KEY(confirmed_by) REFERENCES WAECOFFICER(officer_id),
 	CONSTRAINT CLAIMANT_approved_byBy_fk FOREIGN KEY(approved_by) REFERENCES WAECOFFICER(officer_id),
