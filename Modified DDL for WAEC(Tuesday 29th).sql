@@ -336,20 +336,17 @@ CREATE TABLE OVERNIGHTALLOWANCE(
 	endDate DATE,
 	amountEarned DECIMAL(8,2),
 	CONSTRAINT townForOvernightAllowance_fk FOREIGN KEY(townCode) REFERENCES TOWN(town_code),
-	CONSTRAINT townStatus_forOvernight_fk FOREIGN KEY(townStatusCode) REFERENCES TOWNSTATUS(status_code),
 	CONSTRAINT contractor_overnightAllowance_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
 );
 
 CREATE TABLE TRANSPORTREFUND(
 	townCode INTEGER,
-	townStatusCode INTEGER,
-	--vehicleNumber VARCHAR(20),
+	contractor_code INTEGER,
 	startDate DATE, 
 	endDate DATE,
 	amount_earned DECIMAL(8,2),
-	CONSTRAINT townstatus_transport_fk FOREIGN KEY(townStatusCode) REFERENCES TOWNSTATUS(status_code),
 	CONSTRAINT TransportRefund_towncode_fk FOREIGN KEY(townCode) REFERENCES TOWN(town_code),
-
+	CONSTRAINT TrasportRefund_contractor_code_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
 );
 
 --TABLES TO CAPTURE DIFFRENT MEETINGS AND ENTITLEMENT FOR EACH
