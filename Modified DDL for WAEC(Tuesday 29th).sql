@@ -461,7 +461,7 @@ CREATE TABLE CLAIMANT(
 	checked_by VARCHAR(20),
 	confirmed_by VARCHAR(20), 
 	approved_by VARCHAR(20), 
-	clain_date DATE, 
+	claim_date DATE, 
  
 );
 
