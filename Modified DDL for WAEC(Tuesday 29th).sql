@@ -324,7 +324,6 @@ CREATE TABLE TRANSPORTFARERATE(
 	towncode INTEGER,
 	fareRate DECIMAL(8,2),
 	CONSTRAINT transportfare_pk PRIMARY KEY(towncode, fareRate),
-	CONSTRAINT townstatus_code_fk FOREIGN KEY(townStatusCode) REFERENCES TOWNSTATUS(status_code),
 	CONSTRAINT TransportFare_townCode_fk FOREIGN KEY(towncode) REFERENCES TOWN(town_code),
 );
 
@@ -407,7 +406,11 @@ CREATE TABLE REPORT(
 	subject_paper_code VARCHAR(10),
 	exam_category_code VARCHAR(10),
 	report_rate_code VARCHAR(10),
-	report_date DATE,
+	CONSTRAINT REPORT_contractorCode_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
+	CONSTRAINT REPORT_deitCode_fk FOREIGN KEY(diet_code) REFERENCES EXAMDIET(diet_code),
+	CONSTRAINT REPORT_subjectPaperCode_fk FOREIGN KEY(subject_paper_code) REFERENCES SUBJECTPAPER(subject_paper_code),
+	CONSTRAINT REPORT_examCategory_fk FOREIGN KEY(exam_category_code) REFERENCES EXAMCATEGORY(exam_category_code),
+	CONSTRAINT REPORT_reportRateCode_fk FOREIGN KEY(report_rate_code) REFERENCES REPORTRATE(report_rate_code)
 );
 
 CREATE TABLE SUPERVISION(
@@ -418,6 +421,7 @@ CREATE TABLE SUPERVISION(
 	amountEarned DECIMAL(8,2),
 	CONSTRAINT contractor_supervision_fk FOREIGN KEY(examiner_code) REFERENCES CONTRACTOR(contractor_code),
 	CONSTRAINT supervision_centerNo_fk FOREIGN KEY(centerNo) REFERENCES EXAMCENTER(centre_NUMBER),
+	CONSTRAINT supervision_subjetPaperCode_fk FOREIGN KEY(subject_paper_code) REFERENCES SUBJECTPAPER(subject_paper_code),
 );
 
 CREATE TABLE VETTING(
@@ -426,6 +430,9 @@ CREATE TABLE VETTING(
 	number_of_script INTEGER,
 	centerNo VARCHAR(10),
 	dates DATE,
+	CONSTRAINT VETTING_contractorCode_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
+	CONSTRAINT VETTING_subjetPaperCode_fk FOREIGN KEY(subject_paper_code) REFERENCES SUBJECTPAPER(subject_paper_code),
+	CONSTRAINT VETTING_centerNo_fk FOREIGN KEY(centerNo) REFERENCES EXAMCENTER(centre_NUMBER),
 );
 
 CREATE TABLE DEPARTMENT(
@@ -453,10 +460,14 @@ CREATE TABLE CLAIMANT(
 	claim_type VARCHAR(20),	
 	contractor_code INTEGER, 
 	total_fee DECIMAL(8,2),
-	checked_by VARCHAR(20),
-	confirmed_by VARCHAR(20), 
-	approved_by VARCHAR(20), 
-	claim_date DATE, 
+	checked_by INTEGER(20),
+	confirmed_by INTEGER(20), 
+	approved_by INTEGER(20), 
+	clain_date DATE, 
+	CONSTRAINT VETTING_contractorCode_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
+	CONSTRAINT CLAIMANT_checkedBy_fk FOREIGN KEY(checked_by) REFERENCES WAECOFFICER(officer_id),
+	CONSTRAINT CLAIMANT_confirmedBy_fk FOREIGN KEY(confirmed_by) REFERENCES WAECOFFICER(officer_id),
+	CONSTRAINT CLAIMANT_approved_byBy_fk FOREIGN KEY(approved_by) REFERENCES WAECOFFICER(officer_id),
 );
 
 CREATE TABLE USERS(
