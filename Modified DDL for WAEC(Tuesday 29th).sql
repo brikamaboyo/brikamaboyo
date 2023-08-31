@@ -302,8 +302,8 @@ CREATE TABLE VEHICLEREFUNDRATE(
 	vehicle_code INTEGER,
 	refundRate DECIMAL(8,2),
 	CONSTRAINT vehiclRefundRate_towncode_pk PRIMARY KEY(townCode),
-	CONSTRAINT towncode_fk FOREIGN KEY(townCode) REFERENCES TOWN(town_code),
-	CONSTRAINT VihecleReg_vehicleCode_fk FOREIGN KEY(vehicle_code) REFERENCES VEHICLE(vehicle_code),
+	CONSTRAINT VihecleRefundRate_towncode_fk FOREIGN KEY(townCode) REFERENCES TOWN(town_code),
+	CONSTRAINT VihecleRefundRate_vehicleCode_fk FOREIGN KEY(vehicle_code) REFERENCES VEHICLE(vehicle_code),
 );
 CREATE TABLE VEHICLEREFUND(
 	towncode INTEGER, -- specifies the town
@@ -314,7 +314,7 @@ CREATE TABLE VEHICLEREFUND(
 	endDate DATE,
 	amountEarned DECIMAL(8,2),
 	CONSTRAINT vehicle_refund_pk PRIMARY KEY(vehicleNumber),
-	CONSTRAINT towncode_fk FOREIGN KEY(towncode) REFERENCES VEHICLEREFUNDRATE(townCode),
+	CONSTRAINT VihecleRefund_towncode_fk FOREIGN KEY(towncode) REFERENCES VEHICLEREFUNDRATE(townCode),
 	CONSTRAINT vehicle_code_fk FOREIGN KEY(vehicleNumber) REFERENCES VIHECLEREGISTRATION(vehicleNumber),
 	CONSTRAINT contractor_vehicleRefund_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
 	CONSTRAINT vehicleRefund_vehicleCode_fk FOREIGN KEY(vehicle_code) REFERENCES VEHICLE(vehicle_code),
