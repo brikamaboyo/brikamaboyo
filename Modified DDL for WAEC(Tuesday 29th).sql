@@ -323,7 +323,7 @@ CREATE TABLE VEHICLEREFUND(
 CREATE TABLE TRANSPORTFARERATE(
 	towncode INTEGER,
 	fareRate DECIMAL(8,2),
-	CONSTRAINT transportfare_pk PRIMARY KEY(towncode, townStatusCode, fareRate),
+	CONSTRAINT transportfare_pk PRIMARY KEY(towncode, fareRate),
 	CONSTRAINT townstatus_code_fk FOREIGN KEY(townStatusCode) REFERENCES TOWNSTATUS(status_code),
 	CONSTRAINT TransportFare_townCode_fk FOREIGN KEY(towncode) REFERENCES TOWN(town_code),
 );
