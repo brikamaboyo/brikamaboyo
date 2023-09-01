@@ -456,7 +456,8 @@ CREATE TABLE WAECOFFICER(
 	CONSTRAINT waecOfficer_department_fk FOREIGN KEY(dept_id) REFERENCES DEPARTMENT(dept_id),
 );
 
-CREATE TABLE CLAIMANT(
+CREATE TABLE CLAIM(
+	clain_id INTEGER,
 	claim_type VARCHAR(20),	
 	contractor_code INTEGER, 
 	total_fee DECIMAL(8,2),
