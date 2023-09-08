@@ -7,6 +7,7 @@ CREATE TABLE BANK(
 	
 );
 
+-- KEEPS DIFFERENT BRANCHES OF A BANK
 CREATE TABLE BANKBRANCH(
 	bank_branch_code INTEGER,
 	bank_code INTEGER,
@@ -17,6 +18,7 @@ CREATE TABLE BANKBRANCH(
 	CONSTRAINT bankbranch_bank_fk FOREIGN KEY(bank_code) REFERENCES BANK(bank_code)
 );
 
+-- DIFFERENT QUALIFICATIONS THAT MIGHT BE POSSESSED BY A CONTRACTOR
 CREATE TABLE QUALIFICATION(
 	qualification_code INTEGER IDENTITY(1,1),
 	qualification_name  VARCHAR(40),
@@ -29,12 +31,14 @@ CREATE TABLE REGION (
  CONSTRAINT region_pk PRIMARY KEY (region_code)
 );
 
+-- DIFFERENT TYPES OF DOCUMENTS THAT MIGHT BE PRESENTED FOR IDENTIFICATION BY CONTRACTORS
 CREATE TABLE DOCUMENT(
 	document_code INTEGER IDENTITY(100,1),
 	document_name VARCHAR(40),
 	CONSTRAINT document_pk PRIMARY KEY(document_code)
 );
 
+-- KEEPS ALL THE CONTRACT TYPES THAT ARE AVAILABE IN WAEC 
 CREATE TABLE CONTRACT (
 	contract_code INTEGER IDENTITY(1,1),
 	contract_type VARCHAR(40),
@@ -50,8 +54,8 @@ CREATE TABLE SCHOOL(
 	CONSTRAINT sch_region_fk FOREIGN KEY(scl_region) REFERENCES REGION(region_code)
 );
 
-CREATE TABLE CONTRACTOR(-- USERNAME AND PASSWORD MIGHT BE NEEDED FOR THE EXAMINERS 
-	contractor_code INTEGER, -- CHANGE FROM INTEGER TO VARCHAR
+CREATE TABLE CONTRACTOR(
+	contractor_code INTEGER, 
 	contract_code INTEGER,
 	first_name VARCHAR(40),
 	middle_name VARCHAR(40),
@@ -83,6 +87,7 @@ CREATE TABLE CONTRACTORBANK(
 	CONSTRAINT contrabank_contractor_INTEGER_fk FOREIGN KEY(contractor) REFERENCES CONTRACTOR(contractor_code)
 );
 
+--KEEPS CONTRACTOR QUALIFICATIONS
 CREATE TABLE CONTRACTORQUALIFICATION(
 	contra_qual_code INTEGER,
 	contractor_id INTEGER,
@@ -113,31 +118,19 @@ CREATE TABLE CONTRACTORTUTORIALCLASS(
 	CONSTRAINT tutorial_class_contractor FOREIGN KEY(contractorID) REFERENCES CONTRACTOR(contractor_code),
 	CONSTRAINT tutorial_class_sch FOREIGN KEY(schoolID) REFERENCES SCHOOL(scl_code)
 );
+
 CREATE TABLE EXAMDIET(
 	diet_code VARCHAR(10),
 	dietName VARCHAR(20),
 	CONSTRAINT examDiet_dietCode_pk PRIMARY KEY(diet_code),
 );
+
 CREATE TABLE EXAMCATEGORY(
 	exam_category_code VARCHAR(10),
 	exam_category_name VARCHAR(100), -- WASSCE, GABECE OR NAT
 	diet_code VARCHAR(10), -- INDICATES THE TIME OF THE EXAM 
 	CONSTRAINT examCategory_pk PRIMARY KEY(exam_category_code),
 	CONSTRAINT examCategoryDiet_fk FOREIGN KEY(diet_code) REFERENCES EXAMDIET(diet_code),
-);
-
-CREATE TABLE CONTRACTORPOSTING( 
-	contractorCode INTEGER NOT NULL,
-	contract_code INTEGER NOT NULL,
-	posting_start_date DATE,
-	posting_end_date DATE,
-	centre_Number INTEGER,
-	exam_category_code VARCHAR(10),
-	CONSTRAINT contractoposting_pk PRIMARY KEY(contract_code, posting_end_date, posting_start_date),
-	CONSTRAINT contractoposting_contract_fk FOREIGN KEY(contract_code) REFERENCES CONTRACT(contract_code),
-	CONSTRAINT contractor_contractorPosting_fk FOREIGN KEY(contractorCode) REFERENCES CONTRACTOR(contractor_code),
-	CONSTRAINT contractorPosting_examCategory FOREIGN KEY(exam_category_code) REFERENCES EXAMCATEGORY(exam_category_code),
-
 );
 
 CREATE TABLE BLACKLIST(
@@ -158,7 +151,8 @@ CREATE TABLE SUBJECT(
 	CONSTRAINT SUBJECT_exam_category_code_fk FOREIGN KEY(exam_category_code) REFERENCES EXAMCATEGORY(exam_category_code)
 );
 
-CREATE TABLE SUBJECTPAPER( -- THIS TABLE RECORDS ALL THE SUBJECT PAPERS AND THEIR RATES
+-- THIS TABLE RECORDS ALL THE SUBJECT PAPERS AND THEIR RATES
+CREATE TABLE SUBJECTPAPER( 
 	subject_paper_code VARCHAR(10), -- THEORY, ESSAY ETC
 	subject_code VARCHAR(10), -- THE EXAM SUBJECT
 	exam_category_code VARCHAR(10), -- SUBJECT LEVEL (GABECE, WASSCE OR NAT)
@@ -171,67 +165,92 @@ CREATE TABLE SUBJECTPAPER( -- THIS TABLE RECORDS ALL THE SUBJECT PAPERS AND THEI
 CREATE TABLE COURSEWORK(
 	subject_id VARCHAR(10),
 	Cwrok_exam_category VARCHAR(10), --THIS INDICATE IF PRACTICAL IS FOR WASSCE OR GABECE
+	Cwork_examDiet VARCHAR(10),
 	Cwork_name VARCHAR(20),
 	courseword_rate DECIMAL(8,2),
 	remarks VARCHAR(500),
-	CONSTRAINT coursework_pk PRIMARY KEY(Cwork_name),
+	CONSTRAINT coursework_pk PRIMARY KEY(subject_id),
 	CONSTRAINT coursework_subject_fk FOREIGN KEY(subject_id, Cwrok_exam_category) REFERENCES SUBJECT(subject_code, exam_category_code),
 	CONSTRAINT courseWork_SubjectLevel_fk FOREIGN KEY(Cwrok_exam_category) REFERENCES EXAMCATEGORY(exam_category_code),
+	CONSTRAINT courseWork_ExamDiet_fk FOREIGN KEY(Cwork_examDiet) REFERENCES EXAMDIET(diet_code),
 );
 
 CREATE TABLE PRACTICAL(
 	subject_id VARCHAR(10),
 	exam_category_code VARCHAR(10), --THIS INDICATE IF PRACTICAL IS FOR WASSCE OR GABECE
+	diet_code VARCHAR(10), --IDENTIFIES (MAY/JUNE OR NOVEMBER/DECEMBER)
 	practical_name VARCHAR(20),
 	practical_rate DECIMAL(8,2),
 	remarks VARCHAR(500),
-	CONSTRAINT practical_work_pk PRIMARY KEY(practical_name),
+	CONSTRAINT practical_work_pk PRIMARY KEY(subject_id),
+	CONSTRAINT practical_dietCode_fk FOREIGN KEY(diet_code) REFERENCES EXAMDIET(diet_code),
 	CONSTRAINT practical_work_subject_fk FOREIGN KEY(subject_id, exam_category_code) REFERENCES SUBJECT(subject_code, exam_category_code)
+);
+
+CREATE TABLE ORAL(
+	oral_subject VARCHAR(10),
+	oral_exam_category VARCHAR(10),
+	oral_exam_diet VARCHAR(10),
+	oral_description VARCHAR(50),
+	CONSTRAINT oral_oralSubject_pk PRIMARY KEY(oral_subject),
+	CONSTRAINT oralSubject_subject FOREIGN KEY(oral_subject, oral_exam_category) REFERENCES SUBJECT(subject_code, exam_category_code),
+	CONSTRAINT oral_category_fk FOREIGN KEY(oral_exam_category) REFERENCES EXAMCATEGORY(exam_category_code),
+	CONSTRAINT oral_OralExamDiet_fk FOREIGN KEY(oral_exam_diet) REFERENCES EXAMDIET(diet_code),
 );
 
 --ALLOCATE COURSEWORK TO A CONTRACTOR
 CREATE TABLE COURSEWORKALLOCATION(
 	SN INTEGER,
 	contractor_code INTEGER,
-	Cwork_name VARCHAR(10),
+	Csubject_code VARCHAR(10),
 	number_of_works INTEGER,
 	dates DATE,
 	CONSTRAINT courseWorkAllocation_SN_pk PRIMARY KEY(SN),
 	CONSTRAINT courseWorkAllocation_Contractor_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
-	CONSTRAINT courseWork_courseName_fk FOREIGN KEY(Cwork_name) REFERENCES COURSEWORK(Cwork_name),
+	CONSTRAINT courseWork_courseName_fk FOREIGN KEY(Csubject_code) REFERENCES COURSEWORK(subject_id),
 );
 
 --ALLOCATE PRACTICAL TO A CONTRACTOR
 CREATE TABLE PRACTICALALLOCATION(
 	SN INTEGER,
 	contractor_code INTEGER,
-	practical_name VARCHAR(10),
+	practical_subject VARCHAR(10),
 	number_of_works INTEGER,
 	dates DATE,
 	CONSTRAINT practicalAllocation_SN_pk PRIMARY KEY(SN),
 	CONSTRAINT practicalAllocation_Contractor_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
-	CONSTRAINT practical_courseName_fk FOREIGN KEY(practical_name) REFERENCES PRACTICAL(practical_name),
+	CONSTRAINT practical_courseName_fk FOREIGN KEY(practical_subject) REFERENCES PRACTICAL(subject_id),
+);
+
+--ALLOCATE ORAL TO A CONTRACTOR
+CREATE TABLE ORALALLOCATION(
+	SN INTEGER,
+	contractor_code INTEGER,
+	oral_subject VARCHAR(10),
+	number_of_works INTEGER,
+	dates DATE,
+	CONSTRAINT courseWorkAllocation_SN_pk PRIMARY KEY(SN),
+	CONSTRAINT courseWorkAllocation_Contractor_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
+	CONSTRAINT courseWork_courseName_fk FOREIGN KEY(oral_subject) REFERENCES ORAL(oral_subject),
 );
 
 CREATE TABLE EXAMCENTER(
 	region_code INTEGER,
 	centre_NUMBER VARCHAR(10),
 	centre_name VARCHAR(40),
-	centre_type VARCHAR(40), -- IDENTIFIED IF THE CENTER IS FOR (NAT, WASSCE OR GABECE)
-	centre_address VARCHAR(40), -- SOME CENTERS CAN BE USED FOR BOTH GABECE AND WASSCE
+	centre_address VARCHAR(40), 
 	contact_person VARCHAR(40),
 	phone VARCHAR(40),
 	email VARCHAR(40),
 	CONSTRAINT examcenter_pk PRIMARY KEY(centre_NUMBER),
-	CONSTRAINT examcenter_region_fk FOREIGN KEY(region_code) REFERENCES REGION(region_code)
-	-- A REFERENCE TO EXAM CATEGORY SHOULD BE ADDED HERE  FOR centre_type
+	CONSTRAINT examcenter_region_fk FOREIGN KEY(region_code) REFERENCES REGION(region_code),
 );
 
 -- SCRIPT ALLOCATION TO EXAMINERS FOR MARKING
 CREATE TABLE SCRIPTALLOCATION( 
 	center_code VARCHAR(10),
 	subjectCode VARCHAR(10),
-	subject_level VARCHAR(10),
+	exam_category_code VARCHAR(10),
 	examinerID INTEGER,
 	subjectPaperCode VARCHAR(10),
 	numOfScript INTEGER,
@@ -239,27 +258,16 @@ CREATE TABLE SCRIPTALLOCATION(
 	allocatioction_date DATE,
 	CONSTRAINT seniorScriptMarking_pk PRIMARY KEY(center_code, subjectCode, examinerID),
 	CONSTRAINT schoolid_fk FOREIGN KEY(center_code) REFERENCES EXAMCENTER(centre_NUMBER),
-	CONSTRAINT subjectMarked_fk FOREIGN KEY(subjectCode, subject_level) REFERENCES SUBJECT(subject_code, exam_category_code),
-	CONSTRAINT gScript_examiner_fk FOREIGN KEY(examinerID) REFERENCES CONTRACTOR(contractor_code),
-	CONSTRAINT gScriptAllocation_examPaperCode_fk FOREIGN KEY(subjectPaperCode) REFERENCES SUBJECTPAPER(subject_paper_code),
-
-);
-
-
-CREATE TABLE ORAL(
-	oral_subject VARCHAR(10),
-	oral_Sub_Level VARCHAR(10),
-	oral_description VARCHAR(50),
-	oral_level_category VARCHAR(10),
-	CONSTRAINT oralSubject_subject FOREIGN KEY(oral_subject, oral_Sub_Level) REFERENCES SUBJECT(subject_code, exam_category_code),
-	CONSTRAINT oral_category_fk FOREIGN KEY(oral_level_category) REFERENCES EXAMCATEGORY(exam_category_code),
+	CONSTRAINT subjectMarked_fk FOREIGN KEY(subjectCode, exam_category_code) REFERENCES SUBJECT(subject_code, exam_category_code),
+	CONSTRAINT Script_examiner_fk FOREIGN KEY(examinerID) REFERENCES CONTRACTOR(contractor_code),
+	CONSTRAINT ScriptAllocation_examPaperCode_fk FOREIGN KEY(subjectPaperCode) REFERENCES SUBJECTPAPER(subject_paper_code),
 );
 
 -- ALLOWANCE PAYMENT TO DIFFERENT CONTRACTORS BASED ON THE LOCATION AND STATUS
 
 CREATE TABLE TOWNSTATUS(
 	status_code INTEGER,
-	town_description VARCHAR(40), --
+	town_description VARCHAR(40), 
 	CONSTRAINT townstatus_pk PRIMARY KEY(status_code)
 );
 
@@ -268,47 +276,60 @@ CREATE TABLE TOWN(
 	town_name VARCHAR(40),
 	town_location INTEGER,
 	CONSTRAINT town_town_code_pk PRIMARY KEY(town_code),
-	CONSTRAINT townLocation_fk FOREIGN KEY(town_location) REFERENCES TOWNSTATUS(status_code)
+	CONSTRAINT townLocation_fk FOREIGN KEY(town_location) REFERENCES TOWNSTATUS(status_code),
 );
-			
 
-CREATE TABLE TRANSPORTFARE(
+CREATE TABLE VEHICLE(
+	vehicle_code INTEGER,
+	vehicle_type VARCHAR(40),
+	--vehicle_rate DECIMAL(8,2),
+	CONSTRAINT vehicle_pk PRIMARY KEY(vehicle_code)
+);
+
+CREATE TABLE VIHECLEREGISTRATION(
+	vehicle_code INTEGER,
+	insurance VARCHAR(20),
+	vehicleNumber VARCHAR(20),
+	contractor_code INTEGER,
+	CONSTRAINT VehicleRegistration_VehicleCode_Pk PRIMARY KEY(vehicleNumber),
+	CONSTRAINT VihecleReg_contractor_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
+	CONSTRAINT VihecleReg_vehicleCode_fk FOREIGN KEY(vehicle_code) REFERENCES VEHICLE(vehicle_code),
+);
+
+CREATE TABLE VEHICLEREFUNDRATE(
+	SN INTEGER,
+	townCode INTEGER,
+	vehicle_code INTEGER,
+	refundRate DECIMAL(8,2),
+	CONSTRAINT vehiclRefundRate_towncode_pk PRIMARY KEY(townCode),
+	CONSTRAINT towncode_fk FOREIGN KEY(townCode) REFERENCES TOWN(town_code),
+	CONSTRAINT VihecleReg_vehicleCode_fk FOREIGN KEY(vehicle_code) REFERENCES VEHICLE(vehicle_code),
+);
+CREATE TABLE VEHICLEREFUND(
+	towncode INTEGER, -- specifies the town
+	vehicle_code INTEGER,
+	vehicleNumber VARCHAR(20), -- IDENTIFIES THE VEHICLE ITSELF
+	contractor_code INTEGER,
+	startDate DATE,
+	endDate DATE,
+	amountEarned DECIMAL(8,2),
+	CONSTRAINT vehicle_refund_pk PRIMARY KEY(vehicleNumber),
+	CONSTRAINT towncode_fk FOREIGN KEY(towncode) REFERENCES VEHICLEREFUNDRATE(townCode),
+	CONSTRAINT vehicle_code_fk FOREIGN KEY(vehicleNumber) REFERENCES VIHECLEREGISTRATION(vehicleNumber),
+	CONSTRAINT contractor_vehicleRefund_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
+	CONSTRAINT vehicleRefund_vehicleCode_fk FOREIGN KEY(vehicle_code) REFERENCES VEHICLE(vehicle_code),
+);
+
+CREATE TABLE TRANSPORTFARERATE(
 	towncode INTEGER,
-	townStatusCode INTEGER,
 	fareRate DECIMAL(8,2),
 	CONSTRAINT transportfare_pk PRIMARY KEY(towncode, townStatusCode, fareRate),
 	CONSTRAINT townstatus_code_fk FOREIGN KEY(townStatusCode) REFERENCES TOWNSTATUS(status_code),
 	CONSTRAINT TransportFare_townCode_fk FOREIGN KEY(towncode) REFERENCES TOWN(town_code),
 );
 
-CREATE TABLE VEHICLE(
-	vehicle_code INTEGER,
-	vehicle_type VARCHAR(40),
-	CONSTRAINT vehicle_pk PRIMARY KEY(vehicle_code)
-);
-
-CREATE TABLE EVIHECLEREGISTRATION(
-	vehicle_code INTEGER,
-	insurance VARCHAR(20),
-	licence VARCHAR(20),
-	vehicleNumber VARCHAR(20),
-	contractor_code INTEGER,
-	CONSTRAINT eVihecleReg_contractor_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
-	CONSTRAINT eVihecleReg_vehicleCode_fk FOREIGN KEY(vehicle_code) REFERENCES VEHICLE(vehicle_code),
-);
-
---CREATE TABLE OVERNIGHT(
-	--town_code INTEGER,
-	--townStatus INTEGER,
---	overnight_rate DECIMAL(8,2),
---	fareRate DECIMAL(8,2),
-	--CONSTRAINT townForOvernightAllowance FOREIGN KEY(town_code) REFERENCES TOWN(town_code),
-	--CONSTRAINT townStatus_forOvernight FOREIGN KEY(townStatus) REFERENCES TOWNSTATUS(status_code)
---);
-
 CREATE TABLE OVERNIGHTALLOWANCE(
 	townCode INTEGER, 
-	townStatusCode INTEGER,
 	contractor_code INTEGER,
 	overnight_rate DECIMAL(8,2),
 	startDate DATE,
@@ -317,23 +338,6 @@ CREATE TABLE OVERNIGHTALLOWANCE(
 	CONSTRAINT townForOvernightAllowance_fk FOREIGN KEY(townCode) REFERENCES TOWN(town_code),
 	CONSTRAINT townStatus_forOvernight_fk FOREIGN KEY(townStatusCode) REFERENCES TOWNSTATUS(status_code),
 	CONSTRAINT contractor_overnightAllowance_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
-);
-
-CREATE TABLE VEHICLEREFUND(
-	towncode INTEGER, -- specifies the town
-	townStatusCode INTEGER, --urban or rural
-	vehicleCode INTEGER,
-	vehicleNumber VARCHAR(20), -- IDENTIFIES THE VEHICLE ITSELF
-	contractor_code INTEGER,
-	startDate DATE,
-	endDate DATE,
-	amountEarned DECIMAL(8,2),
-	--vehicle_refund_rate DECIMAL(8,2), -- THE RATE FOR REFUNDING THE VEHICLE USED 
-	CONSTRAINT vehicle_refund_pk PRIMARY KEY(towncode, townStatusCode, vehicleCode),
-	CONSTRAINT towncode_fk FOREIGN KEY(towncode) REFERENCES TOWN(town_code),
-	CONSTRAINT townstatus_vehicle_fk FOREIGN KEY(townStatusCode) REFERENCES TOWNSTATUS(status_code),
-	CONSTRAINT vehicle_code_fk FOREIGN KEY(vehicleCode) REFERENCES VEHICLE(vehicle_code),
-	CONSTRAINT contractor_vehicleRefund_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
 );
 
 CREATE TABLE TRANSPORTREFUND(
@@ -408,7 +412,11 @@ CREATE TABLE REPORT(
 	subject_paper_code VARCHAR(10),
 	exam_category_code VARCHAR(10),
 	report_rate_code VARCHAR(10),
-	
+	CONSTRAINT REPORT_contractorCode_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
+	CONSTRAINT REPORT_deitCode_fk FOREIGN KEY(diet_code) REFERENCES EXAMDIET(diet_code),
+	CONSTRAINT REPORT_subjectPaperCode_fk FOREIGN KEY(subject_paper_code) REFERENCES SUBJECTPAPER(subject_paper_code),
+	CONSTRAINT REPORT_examCategory_fk FOREIGN KEY(exam_category_code) REFERENCES EXAMCATEGORY(exam_category_code),
+	CONSTRAINT REPORT_reportRateCode_fk FOREIGN KEY(report_rate_code) REFERENCES REPORTRATE(report_rate_code)
 );
 
 CREATE TABLE SUPERVISION(
@@ -419,6 +427,7 @@ CREATE TABLE SUPERVISION(
 	amountEarned DECIMAL(8,2),
 	CONSTRAINT contractor_supervision_fk FOREIGN KEY(examiner_code) REFERENCES CONTRACTOR(contractor_code),
 	CONSTRAINT supervision_centerNo_fk FOREIGN KEY(centerNo) REFERENCES EXAMCENTER(centre_NUMBER),
+	CONSTRAINT supervision_subjetPaperCode_fk FOREIGN KEY(subject_paper_code) REFERENCES SUBJECTPAPER(subject_paper_code),
 );
 
 CREATE TABLE VETTING(
@@ -427,8 +436,11 @@ CREATE TABLE VETTING(
 	number_of_script INTEGER,
 	centerNo VARCHAR(10),
 	dates DATE,
-	
+	CONSTRAINT VETTING_contractorCode_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
+	CONSTRAINT VETTING_subjetPaperCode_fk FOREIGN KEY(subject_paper_code) REFERENCES SUBJECTPAPER(subject_paper_code),
+	CONSTRAINT VETTING_centerNo_fk FOREIGN KEY(centerNo) REFERENCES EXAMCENTER(centre_NUMBER),
 );
+
 CREATE TABLE DEPARTMENT(
 	dept_id VARCHAR(5),
 	dept_name VARCHAR(20),
@@ -454,11 +466,14 @@ CREATE TABLE CLAIMANT(
 	claim_type VARCHAR(20),	
 	contractor_code INTEGER, 
 	total_fee DECIMAL(8,2),
-	checked_by VARCHAR(20),
-	confirmed_by VARCHAR(20), 
-	approved_by VARCHAR(20), 
+	checked_by INTEGER(20),
+	confirmed_by INTEGER(20), 
+	approved_by INTEGER(20), 
 	clain_date DATE, 
- 
+	CONSTRAINT VETTING_contractorCode_fk FOREIGN KEY(contractor_code) REFERENCES CONTRACTOR(contractor_code),
+	CONSTRAINT CLAIMANT_checkedBy_fk FOREIGN KEY(checked_by) REFERENCES WAECOFFICER(officer_id),
+	CONSTRAINT CLAIMANT_confirmedBy_fk FOREIGN KEY(confirmed_by) REFERENCES WAECOFFICER(officer_id),
+	CONSTRAINT CLAIMANT_approved_byBy_fk FOREIGN KEY(approved_by) REFERENCES WAECOFFICER(officer_id),
 );
 
 CREATE TABLE USERS(
@@ -472,7 +487,7 @@ CREATE TABLE USERS(
 	CONSTRAINT users_subjectPaper_fk FOREIGN KEY(subject_paper) REFERENCES SUBJECTPAPER(subject_paper_code)
 )
 
--- LOGS TABLE should be created to keep track of the different logins
+-- LOGS TABLE should be created to keep track of the different logins 
 
 CREATE TABLE SETUP( -- THIS TABLE SEEKS TO VALIDATE THE LENGTH OF CANDIDATE CODES 
 	exam_category_code VARCHAR(10),
@@ -516,13 +531,14 @@ CREATE TABLE LOGS(
 
 
 
+--setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("icon.png")));
 
 
 
 
-
-INSERT INTO EXAMCATEGORY VALUES('WASSCE', 'WEST AFRICAN SENIOR SCHOOL CERTIFICATE EXAMINATION');
-INSERT INTO EXAMCATEGORY VALUES('GABECE', 'GAMBIA BASIC EDUCATION CERTIFICATE EXAMINATON');
+INSERT INTO EXAMCATEGORY VALUES('WASSCE', 'WEST AFRICAN SENIOR SCHOOL CERTIFICATE EXAMINATION', 'MAY/JUNE');
+INSERT INTO EXAMCATEGORY VALUES('WASSCE1', 'WEST AFRICAN SENIOR SCHOOL CERTIFICATE EXAMINATION', 'NOV/DEC');
+INSERT INTO EXAMCATEGORY VALUES('GABECE', 'GAMBIA BASIC EDUCATION CERTIFICATE EXAMINATON', NULL);
 
 INSERT INTO SUBJECT VALUES('ENG', 'ENGLISH', 'GABECE', 'YES');
 INSERT INTO SUBJECT VALUES('MAT', 'MATHEMATICS', 'GABECE', 'YES');
@@ -550,22 +566,22 @@ INSERT INTO SUBJECTPAPER VALUES('IRK001', 'IRK', 'GABECE', 8.21 );
 INSERT INTO SUBJECTPAPER VALUES('ART002', 'ART', 'GABECE', 8.21 );
 INSERT INTO SUBJECTPAPER VALUES('HOE002', 'HEC', 'GABECE', 8.21 );
 
-INSERT INTO SUBJECTPAPER VALUES('MAT101', 'MAT', 'WASSCE', 10.03 );
-INSERT INTO SUBJECTPAPER VALUES('ENG101', 'ENG', 'WASSCE', 11.56 );
-INSERT INTO SUBJECTPAPER VALUES('PHY101', 'PHY', 'WASSCE', 10.03 );
-INSERT INTO SUBJECTPAPER VALUES('CHE101', 'CHE', 'WASSCE', 10.03 );
-INSERT INTO SUBJECTPAPER VALUES('GOV101', 'GOV', 'WASSCE', 10.03 );
-INSERT INTO SUBJECTPAPER VALUES('GEO101', 'GEO', 'WASSCE', 10.03 );
-INSERT INTO SUBJECTPAPER VALUES('HIS101', 'HIS', 'WASSCE', 10.03 );
+INSERT INTO SUBJECTPAPER VALUES('MAT101', 'MAT', 'WASSCE1', 10.03 );
+INSERT INTO SUBJECTPAPER VALUES('ENG101', 'ENG', 'WASSCE1', 11.56 );
+INSERT INTO SUBJECTPAPER VALUES('PHY101', 'PHY', 'WASSCE1', 10.03 );
+INSERT INTO SUBJECTPAPER VALUES('CHE101', 'CHE', 'WASSCE2', 10.03 );
+INSERT INTO SUBJECTPAPER VALUES('GOV101', 'GOV', 'WASSCE2', 10.03 );
+INSERT INTO SUBJECTPAPER VALUES('GEO101', 'GEO', 'WASSCE2', 10.03 );
+INSERT INTO SUBJECTPAPER VALUES('HIS101', 'HIS', 'WASSCE1', 10.03 );
 
-INSERT INTO COURSEWORK VALUES('WWK','GABECE', 'WOOD WORK COURSEWORK', 8.21, 'THIS IS THE WOOD WORK PRACTICAL');
+INSERT INTO COURSEWORK VALUES('WWK','GABECE', NULL, 'WOOD WORK COURSEWORK', 8.21, 'THIS IS THE WOOD WORK PRACTICAL');
 
 INSERT INTO REGION VALUES(1, 'GREATER BANJUL AREA');
 INSERT INTO REGION VALUES(2, 'WEST COAST REGION');
 INSERT INTO REGION VALUES(6, 'CENTRAL RIVER RIGION');
 INSERT INTO REGION VALUES(3, 'NORTH BANK REION'); 
 
-INSERT INTO EXAMCENTER VALUES(1, '803000123', 'GSSS', 'WASSCE', 'BANJUL', 'MR. JOHNSON', '2345432', 'john@gmail.com');
+INSERT INTO EXAMCENTER VALUES(1, '803000123', 'GSSS', 'BANJUL', 'MR. JOHNSON', '2345432', 'john@gmail.com');
 
 INSERT INTO BANK VALUES(4501, 'AGIB', 'BANJUL');
 INSERT INTO BANK VALUES(4601, 'GTBANK', 'KAIRABA AVENUE');
@@ -602,16 +618,33 @@ INSERT INTO SCHOOL VALUES( 'JUBS', 'JAMISA UPPER BASIC SCHOOL', 'JUNIOR', 2);
 INSERT INTO SCHOOL VALUES( 'KBSSS', 'KABAFITA SENIOR SECONDARY SCHOOL', 'SENIOR', 2);
 INSERT INTO SCHOOL VALUES( 'KBUSS', 'KABAFITA UPPER BASIC SCHOOL', 'JUNIOR', 2);
 
-INSERT INTO CONTRACTOR VALUES(2000, 1, 'EBOU', 'MD', 'TAMBA', '1989-02-16', NULL, GETDATE(), 'GAMBIAN', 11,'3559876', 'SERREKUNDA', 'ACTIVE', 'ECONOMICS', 2 );
-INSERT INTO CONTRACTOR VALUES(2001, 2, 'OMAR', NULL, 'CAMARA', '1976-02-23', NULL, GETDATE(), 'NIGERIA', 10,'2009844', 'BAKAU', 'ACTIVE', 'MATHEMATICS', 1 );
-INSERT INTO CONTRACTOR VALUES(2002, 1, 'MUSTAPHA', 'MD', 'KONATEH', '1994-09-28', NULL, GETDATE(), 'SERALEON', 13,'7761290', 'LATRI KUNDA', 'ACTIVE', 'PYSICS', 3 );
-INSERT INTO CONTRACTOR VALUES(2003, 3, 'AHMAD', 'S', 'CEESAY', '2000-07-21', NULL, GETDATE(), 'GAMBIAN', 11,'9907786', 'SUKUTA', 'ACTIVE', 'ECONOMICS', 2 );
+INSERT INTO CONTRACTOR VALUES(2000, 1, 'EBOU', 'MD', 'TAMBA', '1989-02-16', NULL, GETDATE(), 'GAMBIAN', 100,'3559876', 'SERREKUNDA', 'ACTIVE', 'ECONOMICS', 2 );
+INSERT INTO CONTRACTOR VALUES(2001, 2, 'OMAR', NULL, 'CAMARA', '1976-02-23', NULL, GETDATE(), 'NIGERIA', 103,'2009844', 'BAKAU', 'ACTIVE', 'MATHEMATICS', 1 );
+INSERT INTO CONTRACTOR VALUES(2002, 1, 'MUSTAPHA', 'MD', 'KONATEH', '1994-09-28', NULL, GETDATE(), 'SERALEON', 103,'7761290', 'LATRI KUNDA', 'ACTIVE', 'PYSICS', 3 );
+INSERT INTO CONTRACTOR VALUES(2003, 3, 'AHMAD', 'S', 'CEESAY', '2000-07-21', NULL, GETDATE(), 'GAMBIAN', 102,'9907786', 'SUKUTA', 'ACTIVE', 'ECONOMICS', 2 );
 
 INSERT INTO CONTRACTORBANK VALUES( 4501, 2001, '001002003456', 'OMAR CAMARA', '009876567252464382');
 INSERT INTO CONTRACTORBANK VALUES( 4601, 2000, '908477747477', 'EBOUT TAMBA', '00823377464774647463');
 INSERT INTO CONTRACTORBANK VALUES( 4501, 2003, '112334444433', 'EBOUT TAMBA', '009876567252464382');
 
 INSERT INTO SCRIPTALLOCATION VALUES('803000123', 'ENG', 'WASSCE', 2001, 'ENG101', 200, 200, GETDATE() );
+
+INSERT INTO DEPARTMENT VALUES('011', 'MARKETING');
+INSERT INTO DEPARTMENT VALUES('012', 'TRAINING');
+INSERT INTO DEPARTMENT VALUES('013', 'ADMIN');
+INSERT INTO DEPARTMENT VALUES('014', 'HR');
+
+INSERT INTO WAECOFFICER VALUES(501, 'MR. JOSEPH', NULL, 'MENDY', '+2203458874', 'joseph@gmail.com', '011', NULL, 'joseph', 'j123');
+INSERT INTO WAECOFFICER VALUES(502, 'MR. YANKUBA', NULL, 'DARBOE', '+2207778900', 'yankuba@gmail.com', '014', NULL, 'yankuba', 'y123');
+INSERT INTO WAECOFFICER VALUES(503, 'MR. LAMIN', NULL, 'TAMBA', '+2203221133', 'lamin@gmail.com', '011', NULL, 'lamin', 'l123');
+INSERT INTO WAECOFFICER VALUES(504, 'MR. LOUIS', NULL, 'EDWARDS', '+2206660332', 'louis@gmail.com', '011', NULL, 'louis', 'l123');
+
+ALTER TABLE USERS
+ADD CONSTRAINT USERS_userRole_fk FOREIGN KEY(user_role) REFERENCES CONTRACTOR(contract_code);
+INSERT INTO USERS VALUES(2003, 3, 'MAT101', 'lamin', 'lamin123');
+INSERT INTO USERS VALUES(2001, 2, 'ENG101', 'user', 'user123');
+INSERT INTO USERS VALUES(2000, 1, 'PHY101', 'user', 'user123');
+
 
 --SOME QUERIES 
 SELECT first_name, last_name, status, contractor_bank, bank_name , account_name, account_Number, bban, subjectPaperCode --numberOfScriptMarked*subject_paper_rate AS ENTITLEMENT
